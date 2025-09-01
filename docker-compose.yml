@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ../serenitune-backend
+      dockerfile: ../deployment/backend/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY:-change_this_in_production}
+    volumes:
+      - ../serenitune-backend/src/static:/app/src/static
+      - ../serenitune-backend/src/database:/app/src/database
+    restart: always
+    networks:
+      - serenitune-network
+
+  frontend:
+    build:
+      context: ../serenitune-frontend
+      dockerfile: ../deployment/frontend/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+    networks:
+      - serenitune-network
+
+networks:
+  serenitune-network:
+    driver: bridge
+
